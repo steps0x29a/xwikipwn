@@ -10,5 +10,7 @@ I, the author, am in no way responsible for any of your actions (or lack thereof
 # Usage
 Put in the address (`http[s]://...`) of any host with an active XWiki installation and the script will test whether this host is vulnerable. If so, it will give you a very basic shell interface as the user that runs XWiki (most likely the server's tomcat user).
 
+You might have to modify the `xwiki` variable to adjust to your host's URL pattern, depending on the XWiki installation.
+
 # Disclaimer 2
 This is a quick and dirty proof of concept and in no way stable or of high quality. Errors are to be expected and the script might destroy your machine, run over your cat or insult your grandmother - in any case, that's your problem :) Use at your own risk. You have been warned :)
