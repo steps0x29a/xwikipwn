@@ -98,6 +98,7 @@ else:
   sys.exit(0)
 
 user = execute_and_read(host, 'whoami')
+# Fancyness is not optional, right?
 success(f"You are now {style.BOLD}{style.BLINK}{fore.LIGHT_BLUE}{user}{style.RESET} on {style.BOLD}{fore.LIGHT_BLUE}{host}{style.RESET}, have fun :)\n")
 
 while(True):
@@ -105,7 +106,7 @@ while(True):
   if cmd.strip() == "exit":
     break
   try:
-    result = execute_and_read(host, cmd)
+    result = replace_entities(execute_and_read(host, cmd))
     print(result)
   except:
     warn(f"Command failed: {fore.RED}{cmd}{style.RESET}")
